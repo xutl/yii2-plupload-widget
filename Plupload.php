@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 
 /**
  * Wrapper for Plupload
@@ -62,6 +63,8 @@ class Plupload extends Widget
      * @var string language
      */
     public $language;
+
+    public $autoUpload = false;
 
     /**
      * The JavaScript event callbacks to attach to Plupload object.
@@ -132,10 +135,17 @@ class Plupload extends Widget
         echo Html::a($this->browseLabel, '#', $this->browseOptions);
         echo Html::endTag('div');
 
+
         // Generate event JavaScript
         $events = '';
-        foreach ($this->events as $event => $callback)
+        foreach ($this->events as $event => $callback) {
             $events .= "{$this->id}.bind('$event', $callback);\n";
+        }
+        //开启自动上传
+        if ($this->autoUpload) {
+            $autoUploadcallback = new JsExpression("function(uploader, files){jQuery(\"#{$this->errorContainer}\").hide();jQuery(\"#{$this->browseOptions['id']}\").button(\"loading\");uploader.start();}");
+            $events .= "{$this->id}.bind('FilesAdded', $autoUploadcallback);\n";
+        }
         $this->view->registerJs("var {$this->id} = new plupload.Uploader($options);\n{$this->id}.init();\n$events");
     }
 }
