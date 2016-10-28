@@ -42,7 +42,7 @@ class PluploadLanguageAsset extends AssetBundle
     public function registerAssetFiles($view)
     {
         if ($this->autoGenerate) {
-            $language = $this->language;
+            $language = str_replace('-', '_', $this->language);
             $fallbackLanguage = substr($this->language, 0, 2);
             if ($fallbackLanguage !== $this->language && !file_exists(Yii::getAlias($this->sourcePath . "/i18n/{$language}.js"))) {
                 $language = $fallbackLanguage;

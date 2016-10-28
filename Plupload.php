@@ -98,18 +98,21 @@ class Plupload extends Widget
         $id = $this->htmlOptions['id'];
 
         if (!isset($this->browseOptions['id']))
-            $this->browseOptions['id'] = "plupload_{$id}_browse";
+            $this->browseOptions['id'] = "{$id}_browse";
+
+        if (!isset($this->browseOptions['class']))
+            $this->browseOptions['class'] = "btn btn-success";
 
         if (!isset($this->errorContainer))
-            $this->errorContainer = "plupload_{$id}_em";
+            $this->errorContainer = "{$id}_em";
         if (!isset($this->options['multipart_params']))
             $this->options['multipart_params'] = [];
         $this->options['multipart_params'][Yii::$app->request->csrfParam] = Yii::$app->request->csrfToken;
         $bundle = PluploadAsset::register($this->view);
 
         $language = $this->language ? $this->language : Yii::$app->language;
-        $assetBundle = PluploadLanguageAsset::register($bundle);
-        $assetBundle->language = $language;
+        $languageBundle = PluploadLanguageAsset::register($this->view);
+        $languageBundle->language = $language;
 
         $defaultOptions = [
             'browse_button' => $this->browseOptions['id'],
@@ -118,7 +121,7 @@ class Plupload extends Widget
             'runtimes' => 'gears,html5,flash,silverlight,browserplus',
             'flash_swf_url' => "{$bundle->baseUrl}/Moxie.swf",
             'silverlight_xap_url' => "{$bundle->baseUrl}/Moxie.xap",
-            'max_file_size' => self::getPHPMaxUploadSize() . 'mb',
+            'max_file_size' => static::getPHPMaxUploadSize() . 'mb',
             'error_container' => "#{$this->errorContainer}",
         ];
         $options = ArrayHelper::merge($defaultOptions, $this->options);
@@ -132,7 +135,7 @@ class Plupload extends Widget
         // Generate event JavaScript
         $events = '';
         foreach ($this->events as $event => $callback)
-            $events .= "uploader.bind('$event', $callback);\n";
-        $this->view->registerJs("var uploader = new plupload.Uploader($options);\nuploader.init();\n$events");
+            $events .= "{$this->id}.bind('$event', $callback);\n";
+        $this->view->registerJs("var {$this->id} = new plupload.Uploader($options);\n{$this->id}.init();\n$events");
     }
 }
