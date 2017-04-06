@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2012 TintSoft Technology Co. Ltd.
  * @license http://www.tintsoft.com/license/
  */
+
 namespace xutl\plupload;
 
 use Yii;
@@ -61,6 +62,7 @@ class PluploadAction extends Action
             FileHelper::createDirectory($this->tempPath, $this->dirMode, true);
         }
     }
+
     /**
      * Runs the action.
      * This method displays the view requested by the user.
@@ -73,8 +75,37 @@ class PluploadAction extends Action
         $filename = $this->getUnusedPath($this->tempPath . DIRECTORY_SEPARATOR . $uploadedFile->name);
         $isUploadComplete = ChunkUploader::process($uploadedFile, $filename);
         if ($isUploadComplete) {
-            if ($this->onComplete) {
+            if ($this->onComplete) {//上传完毕
                 return call_user_func($this->onComplete, $filename, $params);
+            } else if (Yii::$app->hasModule('attachment')) {
+                $config = [
+                    'maxFiles' => 1,
+                    'extensions' => Yii::$app->getModule('attachment')->imageAllowFiles,
+                    'checkExtensionByMimeType' => true,
+                    'mimeTypes' => 'image/*',
+                    "maxSize" => Yii::$app->getModule('attachment')->getMaxUploadByte(),
+                ];
+
+                $uploader = new \yuncms\attachment\components\Uploader([
+                    'fileField' => $filename,
+                    'config' => $config,
+                ]);
+                $uploader->saveLocal();
+                $res = $uploader->getFileInfo();
+                if ($res['state'] == 'SUCCESS') {
+                    return [
+                        "originalName" => $res['original'],
+                        "name" => $res['title'],
+                        "url" => $res['url'],
+                        "size" => $res['size'],
+                        "type" => $res['type'],
+                        "state" => 'SUCCESS'
+                    ];
+                } else {
+                    return [
+                        "state" => Yii::t('app', 'File save failed'),
+                    ];
+                }
             } else {
                 return [
                     'filename' => $filename,
@@ -90,7 +121,8 @@ class PluploadAction extends Action
      * @param string $path
      * @return string
      */
-    protected function getUnusedPath($path) {
+    protected function getUnusedPath($path)
+    {
         $newPath = $path;
         $info = pathinfo($path);
         $suffix = 1;
