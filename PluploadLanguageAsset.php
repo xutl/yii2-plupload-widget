@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class PluploadLanguageAsset extends AssetBundle
 {
-    public $sourcePath = '@xutl/plupload/assets';
+    public $sourcePath = '@vendor/xutl/yii2-plupload-widget/assets';
 
     /**
      * @var boolean whether to automatically generate the needed language js files.

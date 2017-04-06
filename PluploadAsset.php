@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class PluploadAsset extends AssetBundle
 {
-    public $sourcePath = '@xutl/plupload/assets';
+    public $sourcePath = '@vendor/xutl/yii2-plupload-widget/assets';
 
     /**
      * @var array 包含的JS
