@@ -78,22 +78,19 @@ class Plupload extends Widget
     public $events = [];
 
     /**
-     * @return int the max upload size in MB
-     */
-    public static function getPHPMaxUploadSize()
-    {
-        $max_upload = (int)(ini_get('upload_max_filesize'));
-        $max_post = (int)(ini_get('post_max_size'));
-        $memory_limit = (int)(ini_get('memory_limit'));
-        return min($max_upload, $max_post, $memory_limit);
-    }
-
-    /**
      * @inheritdoc
      */
     public function init()
     {
+        parent::init();
         $this->registerTranslations();
+    }
+
+    /**
+     * run is Widget
+     * @throws Exception
+     */
+    public function run(){
         // Make sure URL is provided
         if (empty($this->url))
             throw new Exception(Yii::t('yii', '{class} must specify "url" property value.', array('{class}' => get_class($this))));
@@ -136,7 +133,6 @@ class Plupload extends Widget
         echo Html::a($this->browseLabel, '#', $this->browseOptions);
         echo Html::endTag('div');
 
-
         // Generate event JavaScript
         $events = '';
         foreach ($this->events as $event => $callback) {
@@ -174,5 +170,17 @@ class Plupload extends Widget
                 'xutl/plupload/plupload' => 'plupload.php',
             ],
         ];
+    }
+
+    /**
+     * 获取PHP允许最大上传
+     * @return int the max upload size in MB
+     */
+    public static function getPHPMaxUploadSize()
+    {
+        $max_upload = (int)(ini_get('upload_max_filesize'));
+        $max_post = (int)(ini_get('post_max_size'));
+        $memory_limit = (int)(ini_get('memory_limit'));
+        return min($max_upload, $max_post, $memory_limit);
     }
 }
