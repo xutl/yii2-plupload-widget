@@ -93,6 +93,7 @@ class Plupload extends Widget
      */
     public function init()
     {
+        $this->registerTranslations();
         // Make sure URL is provided
         if (empty($this->url))
             throw new Exception(Yii::t('yii', '{class} must specify "url" property value.', array('{class}' => get_class($this))));
@@ -147,5 +148,31 @@ class Plupload extends Widget
             $events .= "{$this->id}.bind('FilesAdded', $autoUploadcallback);\n";
         }
         $this->view->registerJs("var {$this->id} = new plupload.Uploader($options);\n{$this->id}.init();\n$events");
+    }
+
+    /**
+     * 获取语言包
+     * @param string $message
+     * @param array $params
+     * @return string
+     */
+    public static function t($message, $params = [])
+    {
+        return Yii::t('xutl/plupload/plupload', $message, $params);
+    }
+
+    /**
+     * 注册语言包
+     */
+    public function registerTranslations()
+    {
+        Yii::$app->i18n->translations['xutl/plupload/*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@xutl/plupload/messages',
+            'fileMap' => [
+                'xutl/plupload/plupload' => 'plupload.php',
+            ],
+        ];
     }
 }
